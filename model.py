@@ -10,16 +10,23 @@ from sklearn.neighbors import KNeighborsRegressor
 
 def load_and_describe_data(file_path):
     """
-    Load and describe the data from a numpy file.
+    Load and describe the data from a CSV or pickle file.
 
     Args:
-        file_path (str): The path to the .npy file containing the data.
+        file_path (str): The path to the CSV or pickle file containing the data.
 
     Returns:
-        numpy.ndarray: The data loaded from the file.
+        pd.DataFrame: The data loaded from the file.
     """
-    data = np.load(file_path, allow_pickle=True)
+    if file_path.endswith('.csv'):
+        data = pd.read_csv(file_path)
+    elif file_path.endswith('.pkl'):
+        data = pd.read_pickle(file_path)
+    else:
+        raise ValueError("Unsupported file type. Please provide a CSV or pickle file.")
+    
     print("Data Shape:", data.shape)
+    print(data.dtypes)
     return data
 
 def train_models(X_train, y_train):
@@ -27,8 +34,8 @@ def train_models(X_train, y_train):
     Train various regression models on the training data.
 
     Args:
-        X_train (numpy.ndarray): The training feature data.
-        y_train (numpy.ndarray): The training target data.
+        X_train (pd.DataFrame): The training feature data.
+        y_train (pd.Series): The training target data.
 
     Returns:
         dict: A dictionary containing the trained models.
@@ -48,8 +55,8 @@ def evaluate_models(models, X_test, y_test):
 
     Args:
         models (dict): The trained models.
-        X_test (numpy.ndarray): The testing feature data.
-        y_test (numpy.ndarray): The testing target data.
+        X_test (pd.DataFrame): The testing feature data.
+        y_test (pd.Series): The testing target data.
     """
     model_scores = {'Model': [], 'R2 Score': [], 'MAE': [], 'RMSE': []}
 
@@ -67,10 +74,18 @@ def evaluate_models(models, X_test, y_test):
     return pd.DataFrame(model_scores)
 
 def main():
-    data = load_and_describe_data("dataset.npy")
-    X = data[:, 0:3]
-    y = data[:, 3:]
+    data = load_and_describe_data("dataset.csv")  # Assuming CSV, change if it's pickle
+    X = data[['seed1', 'seed2', 'seed3']]
+    y = data['random_number']
+    print("Shape of X:", X.shape)
+    print("Shape of y:", y.shape)
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    print("X_train shape:", X_train.shape)
+    print("X_test shape:", X_test.shape)
+    print("y_train shape:", y_train.shape)
+    print("y_test shape:", y_test.shape)
 
     models = train_models(X_train, y_train)
     scores_df = evaluate_models(models, X_test, y_test)

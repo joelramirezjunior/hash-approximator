@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import pandas as pd
 
 def wichmann_hill(seed1, seed2, seed3):
     """
@@ -20,15 +21,15 @@ def wichmann_hill(seed1, seed2, seed3):
     random_number = (seed1 / 30269.0 + seed2 / 30307.0 + seed3 / 30323.0) % 1.0
     return random_number
 
-def generate_dataset(size=10000):
+def generate_dataset(size=10000000):
     """
-    Generate a dataset using the Wichmann-Hill random number generator.
+    Generate a dataset using the Wichmann-Hill random number generator and store it as a pandas DataFrame.
 
     Args:
         size (int, optional): The number of random numbers to generate. Defaults to 10000.
 
     Returns:
-        numpy.ndarray: A dataset containing seeds and their corresponding random numbers.
+        pd.DataFrame: A DataFrame containing seeds and their corresponding random numbers.
     """
     dataset = []
     
@@ -39,18 +40,18 @@ def generate_dataset(size=10000):
         random_number = wichmann_hill(seed1, seed2, seed3)
         dataset.append([seed1, seed2, seed3, random_number])
     
-    # Convert the dataset to a structured NumPy array with appropriate data types.
-    dtype = [('seed1', 'i4'), ('seed2', 'i4'), ('seed3', 'i4'), ('random_number', 'f4')]
-    arr = np.array(dataset, dtype=dtype)
+    # Create a pandas DataFrame
+    df = pd.DataFrame(dataset, columns=['seed1', 'seed2', 'seed3', 'random_number'])
     
-    return arr
+    return df
+
 
 def main():
     """
     Main function to generate and save the dataset.
     """
     dataset = generate_dataset()
-    np.save("dataset.npy", dataset)
+    dataset.to_csv("dataset", index=False)
 
 if __name__ == '__main__':
     main()
