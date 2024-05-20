@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import entropy, chisquare, kstest
 
 def wichmann_hill(seed1, seed2, seed3):
     """
@@ -79,17 +80,48 @@ def generate_dataset(size=1000000):
     
     return df
 
-def measure_randomness(numbers):
+def measure_entropy(numbers):
     """
-    Measure the "randomness" of a sequence of numbers using the standard deviation.
+    Measure the entropy of a sequence of numbers.
 
     Args:
         numbers (list): A list of numbers.
 
     Returns:
-        float: The standard deviation of the numbers.
+        float: The entropy of the numbers.
     """
-    return np.std(numbers)
+    counts, _ = np.histogram(numbers, bins=10)
+    return entropy(counts)
+
+def chi_square_test(numbers):
+    """
+    Perform the Chi-Square test on a sequence of numbers.
+
+    Args:
+        numbers (list): A list of numbers.
+
+    Returns:
+        float: The p-value of the Chi-Square test.
+    """
+    counts, _ = np.histogram(numbers, bins=10)
+    return chisquare(counts).pvalue
+
+def kolmogorov_smirnov_test(numbers):
+    """
+    Perform the Kolmogorov-Smirnov test on a sequence of numbers.
+
+    Args:
+        numbers (list): A list of numbers.
+
+    Returns:
+        float: The p-value of the Kolmogorov-Smirnov test.
+    """
+    return kstest(numbers, 'uniform').pvalue
+
+
+def get_uniform_measures(series):
+    return [np.std(series), np.mean(series), np.median(series)]
+
 
 def main():
     """
@@ -105,31 +137,82 @@ def main():
         print("Dataset loaded from CSV file.")
     else:
         # Generate the dataset
-        dataset = generate_dataset(1000)  # Reduced size for quicker execution
+        dataset = generate_dataset(100000)  # Reduced size for quicker execution
         # Save the dataset to a CSV file
         dataset.to_csv(csv_file_path, index=False)
         print("Dataset generated and saved to CSV file.")
 
-    # Calculate randomness measure
-    urandom_randomness = measure_randomness(dataset['urandom_number'])
-    time_randomness = measure_randomness(dataset['time_number'])
-    gen_randomness = measure_randomness(dataset['gen_number'])
 
-    print(f"Randomness measure (Standard Deviation):")
-    print(f"urandom_number: {urandom_randomness}")
-    print(f"time_number: {time_randomness}")
-    print(f"gen_number: {gen_randomness}")
+        # Create histograms for each random number generation method
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
-    # Create subplots for scatter plots
-    fig, axes = plt.subplots(3, 3, figsize=(15, 15))
+    methods = ['urandom_number', 'time_number', 'gen_number']
+    method_titles = ['Random Numbers from /dev/urandom', 'Random Numbers from time-based seeds', 'Random Numbers from generator-based seeds']
 
-    # Plot scatter plots for each seed and random number combination
-    for i, seed in enumerate(['seed1', 'seed2', 'seed3']):
-        for j, col in enumerate(['urandom_number', 'time_number', 'gen_number']):
-            axes[i, j].scatter(dataset[seed], dataset[col], alpha=0.5)
-            axes[i, j].set_title(f"{seed} vs {col}")
-            axes[i, j].set_xlabel(seed)
-            axes[i, j].set_ylabel(col)
+    for i, col in enumerate(methods):
+        axes[i].hist(dataset[col], bins=30, alpha=0.75, color='blue', edgecolor='black')
+        axes[i].set_title(method_titles[i])
+        axes[i].set_xlabel('Random Number')
+        axes[i].set_ylabel('Frequency')
+
+    plt.tight_layout()
+    plt.show()
+
+    # Caluculating the Similarity between Uniform distribution
+    
+    urandom = dataset['urandom_number']
+    time_number = dataset['time_number']
+    gen_number = dataset['gen_number']
+
+    urandom_measures = get_uniform_measures(urandom)
+    time_measures = get_uniform_measures(time_number)
+    gen_measures = get_uniform_measures(gen_number)
+    
+    print(f"STD: {urandom_measures[0]}, Mean: {urandom_measures[1]}, Median:{urandom_measures[2]}." )
+    print(f"STD: {time_measures[0]}, Mean: {time_measures[1]}, Median:{time_measures[2]}." )
+    print(f"STD: {gen_measures[0]}, Mean: {gen_measures[1]}, Median:{gen_measures[2]}." )
+
+    # Calculate randomness measures
+    urandom_entropy = measure_entropy(dataset['urandom_number'])
+    time_entropy = measure_entropy(dataset['time_number'])
+    gen_entropy = measure_entropy(dataset['gen_number'])
+
+    urandom_chi_square = chi_square_test(dataset['urandom_number'])
+    time_chi_square = chi_square_test(dataset['time_number'])
+    gen_chi_square = chi_square_test(dataset['gen_number'])
+
+    urandom_ks_test = kolmogorov_smirnov_test(dataset['urandom_number'])
+    time_ks_test = kolmogorov_smirnov_test(dataset['time_number'])
+    gen_ks_test = kolmogorov_smirnov_test(dataset['gen_number'])
+
+    print(f"Randomness measures (Entropy):")
+    print(f"urandom_number: {urandom_entropy}")
+    print(f"time_number: {time_entropy}")
+    print(f"gen_number: {gen_entropy}")
+
+    print(f"Randomness measures (Chi-Square Test p-value):")
+    print(f"urandom_number: {urandom_chi_square}")
+    print(f"time_number: {time_chi_square}")
+    print(f"gen_number: {gen_chi_square}")
+
+    print(f"Randomness measures (Kolmogorov-Smirnov Test p-value):")
+    print(f"urandom_number: {urandom_ks_test}")
+    print(f"time_number: {time_ks_test}")
+    print(f"gen_number: {gen_ks_test}")
+
+    # Create separate scatter plots for each random number generation method
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+    methods = ['urandom_number', 'time_number', 'gen_number']
+    method_titles = ['Random Numbers from /dev/urandom', 'Random Numbers from time-based seeds', 'Random Numbers from generator-based seeds']
+
+    for i, col in enumerate(methods):
+        for seed in ['seed1', 'seed2', 'seed3']:
+            axes[i].scatter(dataset[seed], dataset[col], alpha=0.5, label=f'{seed} vs {col}')
+        axes[i].set_title(method_titles[i])
+        axes[i].set_xlabel('Seeds')
+        axes[i].set_ylabel('Random Numbers')
+        axes[i].legend()
 
     plt.tight_layout()
     plt.show()
