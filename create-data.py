@@ -89,7 +89,7 @@ def measure_randomness(numbers):
     Returns:
         float: The standard deviation of the numbers.
     """
-    return np.std(numbers)
+    return [np.std(numbers), np.mean(numbers), np.median(numbers)]
 
 def main():
     """
@@ -115,7 +115,7 @@ def main():
     time_randomness = measure_randomness(dataset['time_number'])
     gen_randomness = measure_randomness(dataset['gen_number'])
 
-    print(f"Randomness measure (Standard Deviation):")
+    print(f"Randomness measure (Standard Deviation, Mean, Median):")
     print(f"urandom_number: {urandom_randomness}")
     print(f"time_number: {time_randomness}")
     print(f"gen_number: {gen_randomness}")
