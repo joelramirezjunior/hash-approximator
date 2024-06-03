@@ -90,7 +90,6 @@ def measure_entropy(numbers):
     Returns:
         float: The entropy of the numbers.
     """
-<<<<<<< HEAD
     counts, _ = np.histogram(numbers, bins=10)
     return entropy(counts)
 
@@ -123,9 +122,6 @@ def kolmogorov_smirnov_test(numbers):
 def get_uniform_measures(series):
     return [np.std(series), np.mean(series), np.median(series)]
 
-=======
-    return [np.std(numbers), np.mean(numbers), np.median(numbers)]
->>>>>>> 0d49ab3e57fad6f3551d33356fdf60f7e3bcb7aa
 
 def main():
     """
@@ -147,15 +143,8 @@ def main():
         print("Dataset generated and saved to CSV file.")
 
 
-<<<<<<< HEAD
         # Create histograms for each random number generation method
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-=======
-    print(f"Randomness measure (Standard Deviation, Mean, Median):")
-    print(f"urandom_number: {urandom_randomness}")
-    print(f"time_number: {time_randomness}")
-    print(f"gen_number: {gen_randomness}")
->>>>>>> 0d49ab3e57fad6f3551d33356fdf60f7e3bcb7aa
 
     methods = ['urandom_number', 'time_number', 'gen_number']
     method_titles = ['Random Numbers from /dev/urandom', 'Random Numbers from time-based seeds', 'Random Numbers from generator-based seeds']
@@ -179,9 +168,9 @@ def main():
     time_measures = get_uniform_measures(time_number)
     gen_measures = get_uniform_measures(gen_number)
     
-    print(f"URANDOM: STD: {urandom_measures[0]}, Mean: {urandom_measures[1]}, Median:{urandom_measures[2]}." )
-    print(f"TIME: STD: {time_measures[0]}, Mean: {time_measures[1]}, Median:{time_measures[2]}." )
-    print(f"GEN: STD: {gen_measures[0]}, Mean: {gen_measures[1]}, Median:{gen_measures[2]}." )
+    print(f"URANDOM: VAR: {urandom_measures[0]}, Mean: {urandom_measures[1]}, Median:{urandom_measures[2]}." )
+    print(f"TIME: VAR: {time_measures[0]}, Mean: {time_measures[1]}, Median:{time_measures[2]}." )
+    print(f"GEN: VAR: {gen_measures[0]}, Mean: {gen_measures[1]}, Median:{gen_measures[2]}." )
 
     return
 
