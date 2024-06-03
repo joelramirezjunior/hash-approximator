@@ -168,9 +168,11 @@ def main():
     time_measures = get_uniform_measures(time_number)
     gen_measures = get_uniform_measures(gen_number)
     
-    print(f"STD: {urandom_measures[0]}, Mean: {urandom_measures[1]}, Median:{urandom_measures[2]}." )
-    print(f"STD: {time_measures[0]}, Mean: {time_measures[1]}, Median:{time_measures[2]}." )
-    print(f"STD: {gen_measures[0]}, Mean: {gen_measures[1]}, Median:{gen_measures[2]}." )
+    print(f"URANDOM: STD: {urandom_measures[0]}, Mean: {urandom_measures[1]}, Median:{urandom_measures[2]}." )
+    print(f"TIME: STD: {time_measures[0]}, Mean: {time_measures[1]}, Median:{time_measures[2]}." )
+    print(f"GEN: STD: {gen_measures[0]}, Mean: {gen_measures[1]}, Median:{gen_measures[2]}." )
+
+    return
 
     # Calculate randomness measures
     urandom_entropy = measure_entropy(dataset['urandom_number'])
