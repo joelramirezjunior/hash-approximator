@@ -90,6 +90,7 @@ def measure_entropy(numbers):
     Returns:
         float: The entropy of the numbers.
     """
+<<<<<<< HEAD
     counts, _ = np.histogram(numbers, bins=10)
     return entropy(counts)
 
@@ -122,6 +123,9 @@ def kolmogorov_smirnov_test(numbers):
 def get_uniform_measures(series):
     return [np.std(series), np.mean(series), np.median(series)]
 
+=======
+    return [np.std(numbers), np.mean(numbers), np.median(numbers)]
+>>>>>>> 0d49ab3e57fad6f3551d33356fdf60f7e3bcb7aa
 
 def main():
     """
@@ -143,8 +147,15 @@ def main():
         print("Dataset generated and saved to CSV file.")
 
 
+<<<<<<< HEAD
         # Create histograms for each random number generation method
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+=======
+    print(f"Randomness measure (Standard Deviation, Mean, Median):")
+    print(f"urandom_number: {urandom_randomness}")
+    print(f"time_number: {time_randomness}")
+    print(f"gen_number: {gen_randomness}")
+>>>>>>> 0d49ab3e57fad6f3551d33356fdf60f7e3bcb7aa
 
     methods = ['urandom_number', 'time_number', 'gen_number']
     method_titles = ['Random Numbers from /dev/urandom', 'Random Numbers from time-based seeds', 'Random Numbers from generator-based seeds']
